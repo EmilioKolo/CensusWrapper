@@ -1,0 +1,175 @@
+
+###############################################################
+# Step 1: Explore the census results, look for broad words like "race", "age", etc. 
+python census_explorer.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 100 \
+    --base-tables-only
+
+# Non-interactive search
+python census_explorer.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 100 \
+    --base-tables-only \
+    --keyword "sex by age"
+
+# Longer check grouping variables
+python census_explorer.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 400 \
+    --base-tables-only \
+    --group-by-concept
+
+###############################################################
+# Step 2: Download the columns of interest
+
+## Sex by Age
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B01001_ \
+    --output-folder ./json_tables/
+
+## Race
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B02001_ \
+    --output-folder ./json_tables/
+
+## Detailed Race
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table C02003_ \
+    --output-folder ./json_tables/
+
+## Median Age by Sex
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B01002_ \
+    --output-folder ./json_tables/
+
+## Sex by Age by Employment Status for the Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B23001_ \
+    --output-folder ./json_tables/
+
+
+## Employment Status for the Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B23025_ \
+    --output-folder ./json_tables/
+
+## Occupation by Median Earnings in the Past 12 Months for the Civilian Employed Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B24011_ \
+    --output-folder ./json_tables/
+
+## Detailed Industry for the Civilian Employed Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table B24134_ \
+    --output-folder ./json_tables/
+
+## Language Spoken at Home for the Population 5 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table C16001_ \
+    --output-folder ./json_tables/
+
+## Detailed Occupation for the Civilian Employed Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 600 \
+    --table B24114_ \
+    --output-folder ./json_tables/
+
+## Industry by Occupation for the Civilian Employed Population 16 Years and Over
+python census_table_dump.py \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --max-display 200 \
+    --table C24050_ \
+    --output-folder ./json_tables/
+
+###############################################################
+# Step 3: Download tables
+
+## Sex by Age
+python census_download.py \
+    --input ./json_tables/B01001_sex_by_age.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/B01001_sex_by_age.csv
+
+## Race
+python census_download.py \
+    --input ./json_tables/B02001_race.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/B02001_race.csv
+
+## Detailed Race
+python census_download.py \
+    --input ./json_tables/C02003_detailed_race.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/C02003_detailed_race.csv
+
+## Employment Status for the Population 16 Years and Over
+python census_download.py \
+    --input ./json_tables/B23025_employment_status.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/B23025_employment_status.csv
+
+## Occupation by Median Earnings in the Past 12 Months for the Civilian Employed Population 16 Years and Over
+python census_download.py \
+    --input ./json_tables/B24011_occupation_by_median_earnings.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/B24011_occupation_by_median_earnings.csv
+
+## Language Spoken at Home for the Population 5 Years and Over
+python census_download.py \
+    --input ./json_tables/C16001_language_spoken_home.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/C16001_language_spoken_home.csv
+
+## Detailed Occupation for the Civilian Employed Population 16 Years and Over
+python census_download.py \
+    --input ./json_tables/B24114_detailed_occupation.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/B24114_detailed_occupation.csv
+
+## Industry by Occupation for the Civilian Employed Population 16 Years and Over
+python census_download.py \
+    --input ./json_tables/C24050_industry_by_occupation.json \
+    --year 2024 \
+    --dataset acs/acs5 \
+    --output ./api_tables/C24050_industry_by_occupation.csv

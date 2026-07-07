@@ -1,0 +1,2 @@
+# Basic bioinformatic tools
+pandas==3.0.2

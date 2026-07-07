@@ -1,0 +1,6 @@
+# 1. census_explorer.py
+    # To define the relevant table to select
+# 2. census_table_dump.py
+    # To download the columns of interest
+# 3. census_download.py
+    # To download the per-state data for the columns of interest
