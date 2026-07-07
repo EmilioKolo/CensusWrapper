@@ -5,8 +5,8 @@ census_table_dump.py
 Dump all estimate variables for a specific Census table ID, or list the
 distinct categories available in a table (with example variable IDs).
 Usage:
-    python census_table_dump.py --table B01001
-    python census_table_dump.py --table B01001 --json > column.json
+    python census_table_dump.py --table B01001_
+    python census_table_dump.py --table B01001_ --json column.json
 """
 
 import argparse
@@ -56,6 +56,8 @@ def main():
                         help="Show distinct category names and their example variable IDs, then exit.")
     parser.add_argument("--output-folder", default=".",
                         help="Folder where JSON files will be saved (default: current directory).")
+    parser.add_argument("--json", default=None,
+                        help="Export the full table as a JSON snippet to this file. Skips the command line interface if provided.")
     args = parser.parse_args()
 
     table_prefix = args.table.upper()
@@ -76,8 +78,6 @@ def main():
                 categories[leaf] = {"first_var": var_id, "count": 0, "label": leaf}
             categories[leaf]["count"] += 1
 
-        # Also add a "Total" entry if the table has a variable with just "Total:" without leaf
-        # (handled by the fact that leaf might be "Total" for the universe estimate)
         if not categories:
             sys.exit("No categories found (table may only have totals).")
 
@@ -85,7 +85,7 @@ def main():
         for leaf, info in categories.items():
             print(f"  {info['first_var']:<16s} | {leaf:<40s} ({info['count']} variable{'s' if info['count']>1 else ''})")
 
-        # Optionally export the whole list as a JSON array of category objects (for scripting)
+        # Optionally export the whole list as a JSON array of category objects
         export = input("\nExport this category list as JSON? (y/N): ").strip().lower()
         if export == 'y':
             outname = input("Save to file (e.g., B02001_categories.json): ").strip()
@@ -98,7 +98,7 @@ def main():
                 print(f"Category list saved to {outpath}")
         sys.exit(0)
 
-    # --- Normal variable listing mode (human-readable or interactive JSON export) ---
+    # --- Normal variable listing mode ---
 
     # Human-readable display
     print(f"Table {table_prefix}: {len(matches)} estimate variables.")
@@ -111,27 +111,32 @@ def main():
     if len(matches) > args.max_display:
         print(f"  ... and {len(matches) - args.max_display} more variables. Use --max-display 9999 to see all.")
 
-    # Offer interactive JSON snippet
-    if len(matches) <= args.max_display:
+    if args.json:
+        col_label = os.path.basename(args.json).replace('.json', '')
+        outpath = args.json
+    else:
         snippet = input("\nExport this full table as a JSON snippet? (y/N): ").strip().lower()
         if snippet == 'y':
             col_label = input("Column label (default=concept name): ").strip() or matches[0][2]
             outpath = input("Save to file (e.g., B01001_column): ").strip()
-            if not outpath:
-                print("No filename given; skipping export.")
-            else:
-                # Ensure the filename ends with .json
-                if not outpath.lower().endswith('.json'):
-                    outpath += '.json'
-                # Prepend the output folder
-                outpath = os.path.join(args.output_folder, outpath)
-                entry = {"label": col_label, "variables": [m[0] for m in matches]}
-                try:
-                    with open(outpath, 'w') as f:
-                        json.dump(entry, f, indent=4)
-                    print(f"JSON snippet written to {outpath}")
-                except Exception as e:
-                    print(f"ERROR: Could not write file: {e}")
+    if args.json or snippet == 'y':
+        if not outpath:
+            print("No filename given; skipping export.")
+        else:
+            # Make sure the directory exists
+            os.makedirs(args.output_folder, exist_ok=True)
+            # Ensure the filename ends with .json
+            if not outpath.lower().endswith('.json'):
+                outpath += '.json'
+            # Prepend the output folder
+            outpath = os.path.join(args.output_folder, outpath)
+            entry = {"label": col_label, "variables": [m[0] for m in matches]}
+            try:
+                with open(outpath, 'w') as f:
+                    json.dump(entry, f, indent=4)
+                print(f"JSON snippet written to {outpath}")
+            except Exception as e:
+                print(f"ERROR: Could not write file: {e}")
 
 
 if __name__ == "__main__":

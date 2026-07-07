@@ -8,7 +8,6 @@ matches to a JSON snippet.
 
 import argparse
 import sys
-import json
 import requests
 from collections import OrderedDict
 
@@ -166,21 +165,7 @@ def main():
             if len(matches) > args.max_display:
                 print(f"  ... and {len(matches) - args.max_display} more. Narrow your search to see all.")
         print()
-        continue
-        # Offer JSON snippet from all matches
-        snippet = input("\nGenerate a config JSON snippet for these variables? (y/N): ").strip().lower()
-        if snippet == "y":
-            col_label = input("Column label (e.g., 'Age 0-19'): ").strip()
-            if not col_label:
-                col_label = "Unnamed column"
-            var_ids = [m[0] for m in matches]   # all matching variable IDs
-            entry = {
-                "label": col_label,
-                "variables": var_ids
-            }
-            print("\nAdd this to your config.json \"columns\" array:")
-            print(json.dumps(entry, indent=4))
-        print()   # blank line for readability
+
 
 if __name__ == "__main__":
     main()

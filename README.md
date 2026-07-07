@@ -7,7 +7,7 @@ Python scripts to explore, download, and process US Census Bureau data (ACS 5‑
 |--------|---------|
 | `census_explorer.py` | Search variables by keyword or browse a specific table. Supports grouping by concept, base‑table filtering, and sorting. |
 | `census_table_dump.py` | Dump all estimate variables for a table prefix (e.g., `B01001_`). Also lists distinct categories with example IDs. |
-| `census_simple_download.py` | Download raw data for a column definition (JSON with `"label"` and `"variables"`). Saves a CSV with cleaned labels and optional depth‑split files. |
+| `census_download.py` | Download raw data for a column definition (JSON with `"label"` and `"variables"`). Saves a CSV with cleaned labels and optional depth‑split files. |
 
 ## Usage workflow
 
@@ -15,7 +15,7 @@ Python scripts to explore, download, and process US Census Bureau data (ACS 5‑
 ```bash
 python census_explorer.py --year 2024 --dataset acs/acs5
 ```
-Use `--group-by-concept` for a high‑level view, `--base-tables-only` to skip racial subgroups, `--keyword "sex by age"` to perform a query without the .
+Use `--group-by-concept` for a high‑level view, `--base-tables-only` to skip racial subgroups, `--keyword "sex by age"` to perform a query without the command line interface.
 
 2. **Create column definitions** (for raw download)
 Use `census_table_dump.py` to generate a JSON file with all variables of a table:
@@ -23,20 +23,21 @@ Use `census_table_dump.py` to generate a JSON file with all variables of a table
 ```bash
 python census_table_dump.py --table B01001_ --output-folder ./json_tables
 ```
+Use `--json FILENAME.json` to automatically save a json file for the query without the command line interface prompts.
 
 3. **Download raw data** (simple, one‑variable‑per‑column)
 
 ```bash
-python census_simple_download.py --input ./json_tables/B01001_sex_by_age.json --output B01001_sex_by_age.csv
+python census_download.py --input ./json_tables/B01001_sex_by_age.json --output B01001_sex_by_age.csv
 ```
-The script will save the raw CSV and, by default, also create `age_raw_depth_1.csv`, `age_raw_depth_2.csv`, etc... splitting columns by label depth.
+The script will save the raw CSV and, by default, also create `age_raw_depth_1.csv`, `age_raw_depth_2.csv`, etc., splitting columns by label depth.
 
 ## Setup
 
-1. **Python 3** and the `pandas` package (install with pip):
+1. **Python 3** and the `pandas` and `requests` packages (install with pip):
 
 ```bash
-pip install pandas
+pip install pandas requests
 ```
 
 2. **Census API key**
@@ -53,11 +54,14 @@ export CENSUS_API_KEY="your_key_here"
 
 ## Example: Age distribution by state
 ```bash
+    # 0. (Optional) Explore all columns/tables with a specific string of interest (e.g. "sex by age")
+    python census_explorer.py --year 2024 --dataset acs/acs5 --base-tables-only --keyword "sex by age"
+
     # 1. Dump the "Sex by Age" table to a JSON column definition
-    python census_table_dump.py --table B01001 --output-folder ./json_tables
+    python census_table_dump.py --table B01001_ --output-folder ./json_tables --json B01001_sex_by_age.json
 
     # 2. Download raw data (all variables)
-    python census_simple_download.py --input ./json_tables/B01001_sex_by_age.json --output age_raw.csv
+    python census_download.py --input ./json_tables/B01001_sex_by_age.json --output age_raw.csv
 
     # This produces age_raw.csv (full table) and age_raw_depth_*.csv (split by label depth)
 ```

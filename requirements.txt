@@ -1,2 +1,5 @@
 # Basic bioinformatic tools
 pandas==3.0.2
+
+# API tools
+requests==2.34.2

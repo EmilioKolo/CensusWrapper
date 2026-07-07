@@ -108,12 +108,12 @@ def fetch_variables(variables, year, dataset, api_key):
             df_chunk = df_chunk.drop(columns=["state"])
         all_chunks.append(df_chunk)
 
-    # Merge all chunks on state_fips (and state_name)
+    # Merge all chunks on state_fips and state_name
     if not all_chunks:
         sys.exit("No data fetched.")
     final_df = all_chunks[0]
     for chunk in all_chunks[1:]:
-        # merge on both state_fips and state_name to be safe
+        # Merge on both state_fips and state_name
         final_df = final_df.merge(chunk, on=["state_fips", "state_name"], how="outer")
 
     return final_df
@@ -142,7 +142,7 @@ def get_variable_labels(variables, year, dataset):
 def clean_label(raw_label):
     """
     Convert Census label like 'Estimate!!Total:!!Male:!!Under 5 years'
-    to 'Total_Male_Under 5 years'.
+    to 'Total//Male//Under_5_years'.
     """
     # Remove leading 'Estimate!!'
     if raw_label.startswith("Estimate!!"):
